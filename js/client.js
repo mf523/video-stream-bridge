@@ -53,7 +53,21 @@ function createPeerConnection() {
     };
 
     if (document.getElementById('use-stun').checked) {
-        config.iceServers = [{urls: ['stun:stun.l.google.com:19302']}];
+        config.iceServers = [
+            {
+                urls: [
+                    'stun:stun.l.google.com:19302',
+                    'stun:stun1.l.google.com:19302',
+                    'stun:stun2.l.google.com:19302',
+                    'stun:stun3.l.google.com:19302',
+                    'stun:stun4.l.google.com:19302',
+                ]
+                
+            }
+        ];
+        
+        // let server = document.getElementById('stun-url').value
+        // config.iceServers = [{urls: [server]}]
     }
 
     pc = new RTCPeerConnection(config);
@@ -76,7 +90,7 @@ function createPeerConnection() {
 
     // connect audio / video / stream
     pc.addEventListener('track', function (evt) {
-        console.log(`evt.track.kind: ${evt.track.kind}`)
+        console.log(`evt.track.kind: ${evt.track.kind}`);
         if (evt.track.kind == 'video')
             document.getElementById('video-peer').srcObject = evt.streams[0];
         else
