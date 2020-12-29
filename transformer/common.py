@@ -76,62 +76,44 @@ def processor_on_shm(
     # )
 
     frame_lock.acquire()
-    source = get_from_shm(shm_name_source, shape=shape)
+    source = get_from_shm(shm_name_source, shape=shape, dtype=dtype)
     frame_lock.release()
 
     frame_source = VideoFrame.from_ndarray(source, format="bgr24")
 
-    target = transform_method(frame_source, *args)
+    transformed = transform_method(frame_source, *args)
 
     frame_lock.acquire()
-    put_to_shm(target, shm_name_target)
+    put_to_shm(transformed, shm_name_target)
     frame_lock.release()
 
 
-class DummyTransformTrack(MediaStreamTrack):
+
+
+
+class VideoTransformTrack(MediaStreamTrack):
     """
     A video stream track that transforms frames from an another track.
     """
 
     kind = "video"
-
-    def __init__(self, track, cls_worker, *, params):
-        super().__init__()  # don't forget this!
-        self.track = track
-
-    async def recv(self):
-
-        frame = await self.track.recv()
-
-        return frame
-
-
-class MPVideoTransformTrack(MediaStreamTrack):
-    """
-    A video stream track that transforms frames from an another track.
-    """
-
-    kind = "video"
-    worker = None
-    q_4_worker = mp.JoinableQueue()
-    q_4_leader = mp.Queue()
+    q_task = mp.JoinableQueue()
+    q_result = mp.Queue()
     frame_lock = mp.Lock()
+    shm_size = 10
+    shm_current_frame = shm.SharedMemory(create=True, size=1024 * 1024 * shm_size)
+    shm_transformed_frame = shm.SharedMemory(create=True, size=1024 * 1024 * shm_size)
 
-    def __init__(self, cls_worker, track, shm_size, *, params):
+    def __init__(self, track, *, params):
         super().__init__()  # don't forget this!
+        self.workers = {}
         self.track = track
         self.transform = params['video_transform']
-        self.shm_current_frame = shm.SharedMemory(create=True, size=1024 * 1024 * shm_size)
-        self.shm_transformed_frame = shm.SharedMemory(create=True, size=1024 * 1024 * shm_size)
-
-    @classmethod
-    def create_worker(cls, cls_worker):
-        # p = mp.Process(target=cls.worker, args=())
-        cls.worker = cls_worker(cls.q_4_worker, cls.q_4_leader, args=(cls.frame_lock, ))
-        cls.worker.start()
+        self.count = 0
 
     async def recv(self):
         frame = await self.track.recv()
+        self.count += 1
 
         self.frame_lock.acquire()
         put_to_shm(frame, self.shm_current_frame.name)
@@ -139,32 +121,30 @@ class MPVideoTransformTrack(MediaStreamTrack):
 
         current_frame = frame.to_ndarray(format="bgr24")
 
-        if self.transform in self.worker.transform_list:
-            self.q_4_worker.put(
+        if self.count % 10 == 0:
+            self.q_task.put(
                 {
                     "shape": current_frame.shape,
                     "dtype": current_frame.dtype,
                     "video_transform": self.transform,
-                    "shm_name_current_frame": self.shm_current_frame.name,
-                    "shm_name_transformed_frame": self.shm_transformed_frame.name,
                 }
-                
             )
-            result = self.q_4_leader.get()
+        try:
+            result = self.q_result.get(False)
             # logging.info(f"result: {result}")
-            
+        except Exception:
+            # logging.info(f"result: Empty")
+            None
 
-            self.frame_lock.acquire()
-            transformed_image = get_from_shm(self.shm_transformed_frame.name, shape=current_frame.shape)
-            self.frame_lock.release()
+        self.frame_lock.acquire()
+        transformed_image = get_from_shm(self.shm_transformed_frame.name, shape=current_frame.shape)
+        self.frame_lock.release()
 
-            new_frame = VideoFrame.from_ndarray(transformed_image, format="bgr24")
-            new_frame.pts = frame.pts
-            new_frame.time_base = frame.time_base
+        new_frame = VideoFrame.from_ndarray(transformed_image, format="bgr24")
+        new_frame.pts = frame.pts
+        new_frame.time_base = frame.time_base
 
-            return new_frame
+        return new_frame
 
-        else:
-            return frame
 
 
