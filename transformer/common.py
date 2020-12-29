@@ -117,12 +117,12 @@ class MPVideoTransformTrack(MediaStreamTrack):
     q_4_leader = mp.Queue()
     frame_lock = mp.Lock()
 
-    def __init__(self, cls_worker, track, *, params):
+    def __init__(self, cls_worker, track, shm_size, *, params):
         super().__init__()  # don't forget this!
         self.track = track
         self.transform = params['video_transform']
-        self.shm_current_frame = shm.SharedMemory(create=True, size=1024 * 1024 * 2)
-        self.shm_transformed_frame = shm.SharedMemory(create=True, size=1024 * 1024 * 2)
+        self.shm_current_frame = shm.SharedMemory(create=True, size=1024 * 1024 * shm_size)
+        self.shm_transformed_frame = shm.SharedMemory(create=True, size=1024 * 1024 * shm_size)
 
     @classmethod
     def create_worker(cls, cls_worker):
