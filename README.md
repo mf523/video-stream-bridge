@@ -1,6 +1,14 @@
 # video-stream-bridge
 A small program that play and send video stream over to another backend service for processing, then play the processed stream in live.
 
+## Features
+* Media support: MP4, MJPEG, HLS, Webcam, screenshare
+* Connectivity: video on internet/local network to processing service on internet/local network
+* Backend processing: customizable backend processing, plug and play
+* UI Screenshot
+
+![img/screenshot1.jpg](img/screenshot1.jpg)
+
 ## Requirements
 * Python 3.8+ (required by shm)
 * 
@@ -12,3 +20,8 @@ A small program that play and send video stream over to another backend service 
 * getUserMedia, getDisplayMedia are not available via http protocol
 ** https://stackoverflow.com/questions/60957829/navigator-mediadevices-is-undefined
 * some mjpeg cams do not support CORS
+
+## References
+* https://webrtc.github.io/samples/
+* https://www.lynnislu.com/posts/mjpeg/
+* https://hls-js.netlify.app/demo/
