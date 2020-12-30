@@ -3,7 +3,7 @@ A small program that play and send video stream over to another backend service 
 
 ## Features
 * Media support: MP4, MJPEG, HLS, Webcam, screenshare
-* Connectivity: internet, local network
+* Connectivity: video on internet/local network to processing service on internet/local network
 * Backend processing: customizable backend processing, plug and play
 
 ## Requirements
