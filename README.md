@@ -1,6 +1,11 @@
 # video-stream-bridge
 A small program that play and send video stream over to another backend service for processing, then play the processed stream in live.
 
+## Features
+* Media support: MP4, MJPEG, HLS, Webcam, screenshare
+* Connectivity: internet, local network
+* Backend processing: customizable backend processing, plug and play
+
 ## Requirements
 * Python 3.8+ (required by shm)
 * 
