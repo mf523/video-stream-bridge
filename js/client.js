@@ -57,10 +57,10 @@ function createPeerConnection() {
             {
                 urls: [
                     'stun:stun.l.google.com:19302',
-                    'stun:stun1.l.google.com:19302',
-                    'stun:stun2.l.google.com:19302',
-                    'stun:stun3.l.google.com:19302',
-                    'stun:stun4.l.google.com:19302',
+                    'stun:stun1.l.google.com:19302'
+                    //'stun:stun2.l.google.com:19302',
+                    //'stun:stun3.l.google.com:19302',
+                    //'stun:stun4.l.google.com:19302'
                 ]
                 
             }
@@ -193,6 +193,21 @@ function start() {
                 });
             }
         }
+        
+    } else if (document.getElementById('use-sharescreen').checked){
+        // https://webrtc.github.io/samples/src/content/getusermedia/getdisplaymedia/
+        
+        if (adapter.browserDetails.browser == 'firefox') {
+            adapter.browserShim.shimGetDisplayMedia(window, 'screen');
+        }
+        
+        navigator.mediaDevices.getDisplayMedia({video: true}).then(function (stream) {
+            window.stream = stream; // make variable available to browser console
+            video_local.srcObject = stream;
+        }, function (err) {
+            alert('Could not acquire media: ' + err);
+        });
+        
     } else {
         var constraints = {
             audio: document.getElementById('use-audio').checked,

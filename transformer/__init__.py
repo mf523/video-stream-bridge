@@ -18,11 +18,11 @@ def get_transformer(video_transform):
     
     video_transform = video_transform.split('.')
     return {
-        'opencv': opencv.Transformer,
-        'my_nn': my_nn.Transformer,
+        'opencv': opencv.Worker,
+        'my_nn': my_nn.Worker,
     }.get(
         video_transform[0],
-        dummy.Transformer,
+        dummy.Worker,
     )
 
 

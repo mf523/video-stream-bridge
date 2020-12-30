@@ -13,6 +13,21 @@ from aiortc import MediaStreamTrack, RTCPeerConnection, RTCSessionDescription
 from aiortc.contrib.media import MediaBlackhole, MediaPlayer, MediaRecorder
 
 
+def st_time(func):
+    """
+        st decorator to calculate the total time of a func
+    """
+
+    def st_func(*args, **keyArgs):
+        t1 = time.time()
+        r = func(*args, **keyArgs)
+        t2 = time.time()
+        print(f"Function={func.__name__}, Time={t2 - t1}")
+        return r
+
+    return st_func
+    
+
 def put_to_shm(frame, shm_name):
 
     shm_frame = shm.SharedMemory(name=shm_name)
@@ -97,8 +112,7 @@ class VideoTransformTrack(MediaStreamTrack):
     """
 
     kind = "video"
-    q_task = mp.JoinableQueue()
-    q_result = mp.Queue()
+    p_in = None
     frame_lock = mp.Lock()
     shm_size = 10
     shm_current_frame = shm.SharedMemory(create=True, size=1024 * 1024 * shm_size)
@@ -110,6 +124,7 @@ class VideoTransformTrack(MediaStreamTrack):
         self.track = track
         self.transform = params['video_transform']
         self.count = 0
+        self.transformer_pid = None
 
     async def recv(self):
         frame = await self.track.recv()
@@ -122,19 +137,13 @@ class VideoTransformTrack(MediaStreamTrack):
         current_frame = frame.to_ndarray(format="bgr24")
 
         if self.count % 10 == 0:
-            self.q_task.put(
+            self.p_in.send(
                 {
                     "shape": current_frame.shape,
                     "dtype": current_frame.dtype,
                     "video_transform": self.transform,
                 }
             )
-        try:
-            result = self.q_result.get(False)
-            # logging.info(f"result: {result}")
-        except Exception:
-            # logging.info(f"result: Empty")
-            None
 
         self.frame_lock.acquire()
         transformed_image = get_from_shm(self.shm_transformed_frame.name, shape=current_frame.shape)

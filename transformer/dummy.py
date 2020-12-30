@@ -11,12 +11,24 @@ from .common import (
 )
 
 
+import logging
+# import auxiliary_module
+
+# create logger with 'spam_application'
+logger = logging.getLogger('server')
+logger.setLevel(logging.DEBUG)
+# create file handler which logs even debug messages
+fh = logging.FileHandler('server.log')
+fh.setLevel(logging.DEBUG)
+logger.addHandler(fh)
+
+
 def dummy_transform(frame):
 
     return frame
 
 
-class Transformer(mp.Process):
+class Worker(mp.Process):
     
     transform_list = {
         "none": None,
@@ -24,30 +36,31 @@ class Transformer(mp.Process):
 
     def __init__(
             self,
-            q_task,
-            q_result,
             frame_lock,
             shm_name_current_frame,
             shm_name_transformed_frame,
             *,
             args=[]
     ):
-        # https://noswap.com/blog/python-multiprocessing-keyboardinterrupt
-        signal.signal(signal.SIGINT, signal.SIG_IGN)
         mp.Process.__init__(self, args=args)
-        self.q_task = q_task
-        self.q_result = q_result
+        self.daemon = True
+        self.p_out, self.p_in = mp.Pipe(False) # not duplex
         self.frame_lock = frame_lock
         self.shm_name_current_frame = shm_name_current_frame
         self.shm_name_transformed_frame = shm_name_transformed_frame
 
     def run(self):
+        # https://noswap.com/blog/python-multiprocessing-keyboardinterrupt
+        signal.signal(signal.SIGINT, signal.SIG_IGN)
         proc_name = self.name
+        logger.info(f"{self.pid} - pipe polling")
         while True:
             msg = None
-            try:
-                msg = self.q_task.get(False)
-            except Exception:
+            if self.p_out.poll():
+                logger.info(f"{self.pid} - pipe read start")
+                msg = self.p_out.recv()
+                logger.info(f"{self.pid} - pipe read stop")
+            else:
                 # logging.info(f"result: Empty")
                 import time
                 time.sleep(1)
@@ -56,10 +69,13 @@ class Transformer(mp.Process):
                 # Poison pill means shutdown
                 # print '%s: Exiting' % proc_name
 
-                break
+                logger.info(f"{self.pid} got empty msg, sleeping")  
+
+                time.sleep(1)
             else:
                 # self.q_task.task_done()
                 transform_method = self.transform_list.get(msg.get("video_transform"))
+                logger.info(f"{self.pid} transform_method: {transform_method}")
 
                 processor_on_shm(
                     dummy_transform,
@@ -72,8 +88,6 @@ class Transformer(mp.Process):
                 
                 # print '%s: %s' % (proc_name, next_task)
                 answer = f"{transform_method} done!"
-                # self.q_4_worker.task_done()
-                self.q_result.put(answer)
             
         return
 

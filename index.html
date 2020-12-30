@@ -32,7 +32,6 @@
 </head>
 <body>
 <h2>Options</h2>
-
 <div class="option">
     <label>Video options</label>
 
@@ -45,10 +44,10 @@
     </select>
     <select id="video-transform">
         <option value="none">No transform</option>
-        <option value="opencv.edges">OpenCV - Edge detection</option>
+        <option value="opencv.edges" selected>OpenCV - Edge detection</option>
         <option value="opencv.cartoon">OpenCV - Cartoon</option>
         <option value="opencv.rotate">OpenCV - Rotate</option>
-        <option value="my_nn.cartoon.Hayao" selected>MyNN - Cartoon - Hayao</option>
+        <option value="my_nn.cartoon.Hayao">MyNN - Cartoon - Hayao</option>
         <option value="my_nn.cartoon.Hosoda">MyNN - Cartoon - Hosoda</option>
         <option value="my_nn.cartoon.Paprika">MyNN - Cartoon - Paprika</option>
         <option value="my_nn.cartoon.Shinkai">MyNN - Cartoon - Shinkai</option>
@@ -62,7 +61,10 @@
 <div class="option">
     <input id="use-webcam" name="use-video" value="use-webcam" type="radio"/>
     <label for="use-webcam">Use webcam</label>
-
+    
+    <input id="use-sharescreen" name="use-video" value="use-sharescreen" type="radio"/>
+    <label for="use-sharescreen">Use share-screen</label>
+    
     <input id="use-stream" name="use-video" checked="checked" value="use-stream" type="radio"/>
     <label for="use-stream">Use stream</label>
     <select id="stream-type">
@@ -163,8 +165,11 @@
 <h3>Answer</h3>
 <pre id="answer-sdp" style="height: 200px;"></pre>
 
-<canvas id="mjpeg-player" style="background: #000; visibility: hidden;"/>
+<canvas id="mjpeg-player" style="background: #000; visibility: hidden;"></canvas>
 
+</script>
+
+<script src="js/adapter-latest.js"></script>
 <script src="js/client.js"></script>
 <script src="js/mjpeg_video.js"></script>
 <script src="js/hls.js"></script>
