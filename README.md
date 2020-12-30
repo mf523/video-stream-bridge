@@ -11,7 +11,10 @@ A small program that play and send video stream over to another backend service 
 
 ## Requirements
 * Python 3.8+ (required by shm)
-* 
+* aiortc 1+
+* opencv-python 4.4+
+* Pillow 8+
+
 
 ## Throubleshooting
 * ```RuntimeError: Cannot re-initialize CUDA in forked subprocess. To use CUDA with multiprocessing, you must use the 'spawn' start method```
