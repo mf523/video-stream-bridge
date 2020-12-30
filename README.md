@@ -5,6 +5,9 @@ A small program that play and send video stream over to another backend service 
 * Media support: MP4, MJPEG, HLS, Webcam, screenshare
 * Connectivity: video on internet/local network to processing service on internet/local network
 * Backend processing: customizable backend processing, plug and play
+* UI Screenshot
+
+![img/ui1.jpg](img/ui1.jpg)
 
 ## Requirements
 * Python 3.8+ (required by shm)
