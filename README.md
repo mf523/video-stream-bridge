@@ -7,7 +7,7 @@ A small program that play and send video stream over to another backend service 
 * Backend processing: customizable backend processing, plug and play
 * UI Screenshot
 
-![img/ui1.jpg](img/ui1.jpg)
+![img/screenshot1.jpg](img/screenshot1.jpg)
 
 ## Requirements
 * Python 3.8+ (required by shm)
