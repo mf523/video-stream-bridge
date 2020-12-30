@@ -2,7 +2,7 @@
 A small program that play and send video stream over to another backend service for processing, then play the processed stream in live.
 
 ## Requirements
-* Python 3.8+
+* Python 3.8+ (required by shm)
 * 
 
 ## Throubleshooting
