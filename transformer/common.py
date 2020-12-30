@@ -12,6 +12,17 @@ import logging
 from aiortc import MediaStreamTrack, RTCPeerConnection, RTCSessionDescription
 from aiortc.contrib.media import MediaBlackhole, MediaPlayer, MediaRecorder
 
+import logging
+# import auxiliary_module
+
+# create logger with 'spam_application'
+logger = logging.getLogger('server')
+logger.setLevel(logging.DEBUG)
+# create file handler which logs even debug messages
+fh = logging.FileHandler('server.log')
+fh.setLevel(logging.DEBUG)
+logger.addHandler(fh)
+
 
 def st_time(func):
     """
@@ -135,6 +146,7 @@ class VideoTransformTrack(MediaStreamTrack):
         self.frame_lock.release()
 
         current_frame = frame.to_ndarray(format="bgr24")
+        # logger.info(f"current_frame.shape: {current_frame.shape}")
 
         if self.count % 10 == 0:
             self.p_in.send(
