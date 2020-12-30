@@ -20,3 +20,8 @@ A small program that play and send video stream over to another backend service 
 * getUserMedia, getDisplayMedia are not available via http protocol
 ** https://stackoverflow.com/questions/60957829/navigator-mediadevices-is-undefined
 * some mjpeg cams do not support CORS
+
+## References
+* https://webrtc.github.io/samples/
+* https://www.lynnislu.com/posts/mjpeg/
+* https://hls-js.netlify.app/demo/
