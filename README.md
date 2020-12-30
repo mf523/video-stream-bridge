@@ -1,4 +1,4 @@
-# video-stream-bridge
+# Video Stream Bridge
 A small program that play and send video stream over to another backend service for processing, then play the processed stream in live.
 
 ## Features
@@ -24,5 +24,6 @@ A small program that play and send video stream over to another backend service 
 
 ## References
 * https://webrtc.github.io/samples/
+* https://github.com/aiortc/aiortc
 * https://www.lynnislu.com/posts/mjpeg/
 * https://hls-js.netlify.app/demo/
