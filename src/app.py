@@ -61,19 +61,19 @@ def create_worker(video_transform, video_stream):
 
 async def index(request):
     logging.info(f"request: '{request}'")
-    content = open(os.path.join(SRC_ROOT, "index.html"), "r").read()
+    content = open(os.path.join(SRC_ROOT, "frontend/index.html"), "r").read()
     return web.Response(content_type="text/html", text=content)
 
 
 async def js(request):
     # https://docs.aiohttp.org/en/stable/web_quickstart.html#aiohttp-web-variable-handler
-    content = open(os.path.join(SRC_ROOT, f"js/{request.match_info['filename']}"), "r").read()
+    content = open(os.path.join(SRC_ROOT, f"frontend/js/{request.match_info['filename']}"), "r").read()
     return web.Response(content_type="application/javascript", text=content)
 
 
 async def img(request):
     # https://docs.aiohttp.org/en/stable/web_quickstart.html#aiohttp-web-variable-handler
-    content = open(os.path.join(PROJECT_ROOT, f"img/{request.match_info['filename']}"), "rb").read()
+    content = open(os.path.join(PROJECT_ROOT, f"frontend/img/{request.match_info['filename']}"), "rb").read()
     return web.Response(content_type="application/octet-stream", body=content)
 
 async def offer(request):
